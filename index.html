@@ -397,7 +397,7 @@
 const candidates = [
   {
     id: 'patty',
-    name: 'Patty Yu 余佩芳',
+    name: 'Patty 余佩芳',
     dept: 'People',
     deptClass: 'dept-people',
     role: 'C&B Specialist',
@@ -411,7 +411,7 @@ const candidates = [
   },
   {
     id: 'hazel',
-    name: 'Hazel Liao 廖珮涵',
+    name: 'Hazel 廖珮涵',
     dept: 'People',
     deptClass: 'dept-people',
     role: 'C&B Specialist',
@@ -437,7 +437,7 @@ const candidates = [
   },
   {
     id: 'eric',
-    name: '王祥宇',
+    name: 'Eric 王祥宇',
     dept: '私募',
     deptClass: 'dept-private',
     role: '產品專家',
@@ -508,7 +508,7 @@ function render() {
 
     card.innerHTML = `
       <div class="card-photo">
-        <img src="${c.photo}" alt="${c.name}" style="object-position:${c.photoPos||'center center'}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <img src="${c.photo}" alt="${c.name}" style="object-position:${c.photoPos||'center top'}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="avatar-fallback" style="background:${c.avatarBg};color:${c.avatarColor};display:none">${c.avatarText}</div>
         <div class="check-badge">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
