@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spot Award 2026 Q1 · 票選</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --amber-50: #FAEEDA;
+    --amber-100: #FAC775;
+    --amber-400: #EF9F27;
+    --amber-600: #BA7517;
+    --amber-800: #633806;
+    --teal-50: #E1F5EE;
+    --teal-600: #0F6E56;
+    --teal-800: #085041;
+    --blue-50: #E6F1FB;
+    --blue-600: #185FA5;
+    --blue-800: #0C447C;
+    --purple-50: #EEEDFE;
+    --purple-600: #534AB7;
+    --purple-800: #3C3489;
+    --coral-50: #FAECE7;
+    --coral-600: #993C1D;
+    --coral-800: #712B13;
+    --gray-100: #D3D1C7;
+    --gray-400: #888780;
+    --gray-600: #5F5E5A;
+    --text-primary: #1a1a1a;
+    --text-secondary: #5F5E5A;
+    --text-muted: #888780;
+    --bg-primary: #ffffff;
+    --bg-secondary: #F8F7F4;
+    --bg-page: #F3F1EC;
+    --border-light: rgba(0,0,0,0.1);
+    --border-medium: rgba(0,0,0,0.18);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 0 0 4rem;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-light);
+    padding: 2.5rem 1.5rem 2rem;
+    text-align: center;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--amber-50);
+    color: var(--amber-800);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.8px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .site-header h1 {
+    font-size: clamp(22px, 4vw, 30px);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .site-header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* ── Vote counter ── */
+  .vote-tracker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 1.25rem 1rem;
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-light);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .dot {
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    border: 1.5px solid var(--amber-600);
+    background: transparent;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .dot.filled {
+    background: var(--amber-600);
+    transform: scale(1.1);
+  }
+  .tracker-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-left: 4px;
+  }
+  .tracker-label strong { color: var(--amber-600); font-weight: 600; }
+
+  /* ── Grid ── */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { border-color: var(--border-medium); }
+  .card.selected {
+    border: 2px solid var(--amber-600);
+    box-shadow: 0 0 0 3px rgba(186,117,23,0.08);
+  }
+  .card.maxed:not(.selected) {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .card-photo {
+    width: 100%;
+    height: 200px;
+    background: var(--bg-secondary);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+  .avatar-fallback {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 600;
+  }
+  .check-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--amber-600);
+    display: none;
+    align-items: center; justify-content: center;
+  }
+  .card.selected .check-badge { display: flex; }
+  .check-badge svg { display: block; }
+
+  .card-body { padding: 14px 16px 4px; }
+
+  .dept-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+  }
+  .dept-people   { background: var(--teal-50);   color: var(--teal-800); }
+  .dept-ops      { background: var(--amber-50);  color: var(--amber-800); }
+  .dept-private  { background: var(--purple-50); color: var(--purple-800); }
+  .dept-finance  { background: var(--blue-50);   color: var(--blue-800); }
+  .dept-advisory { background: var(--blue-50);   color: var(--blue-800); }
+  .dept-tech     { background: var(--coral-50);  color: var(--coral-800); }
+
+  .card-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+  .card-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; margin-bottom: 10px; }
+
+  .value-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+  .vtag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 0.5px solid var(--border-light);
+  }
+
+  .story-wrap { position: relative; margin-bottom: 8px; }
+  .story {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .story.clamped {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .read-toggle {
+    font-size: 12px;
+    color: var(--amber-600);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    margin-top: 2px;
+    display: block;
+  }
+  .read-toggle:hover { text-decoration: underline; }
+
+  .quote-block {
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-left: 2px solid var(--amber-400);
+    padding: 6px 0 6px 10px;
+    margin: 10px 0 14px;
+    font-style: italic;
+    line-height: 1.65;
+  }
+
+  .card-footer {
+    padding: 10px 16px 14px;
+    border-top: 0.5px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .vote-btn {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 20px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--amber-600);
+    color: var(--amber-800);
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+  }
+  .vote-btn:hover { background: var(--amber-50); }
+  .vote-btn.voted {
+    background: var(--amber-600);
+    color: #fff;
+    border-color: var(--amber-600);
+  }
+  .vote-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Submit area ── */
+  .submit-section {
+    max-width: 480px;
+    margin: 2.5rem auto 0;
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    padding: 1.75rem 2rem;
+    text-align: center;
+  }
+  .submit-section h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+  }
+  .submit-section p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+  }
+  .field-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .field-row label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    width: 70px;
+    text-align: right;
+  }
+  .field-row input {
+    flex: 1;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-medium);
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    outline: none;
+  }
+  .field-row input:focus { border-color: var(--amber-600); }
+
+  .submit-btn {
+    width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 11px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--amber-600);
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+    margin-top: 4px;
+  }
+  .submit-btn:hover { opacity: 0.88; }
+  .submit-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ── Success ── */
+  .success-box {
+    display: none;
+    background: var(--teal-50);
+    border: 0.5px solid rgba(15,110,86,0.2);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  .success-box h3 { font-size: 17px; font-weight: 600; color: var(--teal-600); margin-bottom: 6px; }
+  .success-box p { font-size: 13px; color: var(--teal-800); line-height: 1.65; }
+
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; }
+    .submit-section { margin: 2rem 0 0; border-radius: var(--radius-lg); }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="badge">2026 Q1 · Spot Award</div>
+  <h1>選出你心目中的 Q1 MVP</h1>
+  <p>閱讀每位候選人的故事，選出最讓你印象深刻的三位。每人限投 3 票。</p>
+</header>
+
+<div class="vote-tracker">
+  <div class="dot" id="d1"></div>
+  <div class="dot" id="d2"></div>
+  <div class="dot" id="d3"></div>
+  <span class="tracker-label" id="tracker-label">尚未投票</span>
+</div>
+
+<main class="main">
+  <div class="grid" id="card-grid"></div>
+
+  <div class="submit-section">
+    <h2>送出投票</h2>
+    <p id="submit-hint">請選擇 3 位候選人後填寫姓名並提交。</p>
+    <div class="field-row">
+      <label>投票人</label>
+      <input type="text" id="voter-name" placeholder="請填寫您的姓名" />
+    </div>
+    <div class="field-row">
+      <label>部門</label>
+      <input type="text" id="voter-dept" placeholder="您的部門（選填）" />
+    </div>
+    <button class="submit-btn" id="submit-btn" disabled onclick="submitVote()">確認送出</button>
+
+    <div class="success-box" id="success-box">
+      <h3>感謝您的投票！</h3>
+      <p id="success-detail"></p>
+    </div>
+  </div>
+</main>
+
+<script>
+const candidates = [
+  {
+    id: 'patty',
+    name: 'Patty Yu 余佩芳',
+    dept: 'People',
+    deptClass: 'dept-people',
+    role: 'C&B Specialist',
+    avatarText: 'PY',
+    avatarBg: '#E1F5EE', avatarColor: '#085041',
+    values: ['追求卓越', '主動創新'],
+    story: 'Q1 正值 C&B 團隊人力調整期，薪資結算、新人報到建檔等核心業務無法中斷。Patty 在人手不足的情況下，獨立承接完整的月結作業與報到流程，每月準時交付，零錯誤、零延遲。更值得一提的是，她沒有把「做完」當終點——面對重複性高的建檔作業，她主動盤點流程缺口，提出簡化步驟的建議，讓後續交接更順暢。對一個還在熟悉業務的 C&B 新手來說，這份主動性不是理所當然的。',
+    quote: '人少的時候，有人選擇等、有人選擇撐——Patty 選擇想辦法讓事情做得更好。',
+    photo: 'images/Patty_余佩芳.png'
+  },
+  {
+    id: 'hazel',
+    name: 'Hazel Liao 廖珮涵',
+    dept: 'People',
+    deptClass: 'dept-people',
+    role: 'C&B Specialist',
+    avatarText: 'HL',
+    avatarBg: '#E1F5EE', avatarColor: '#085041',
+    values: ['追求卓越', '解決問題'],
+    story: 'Q1 C&B 人力吃緊，薪資結算與報到建檔的壓力同時落在 Hazel 身上。她沒有因為人手不足而降低標準，每一份文件如期產出、每一筆資料核對無誤，在高壓節奏下維持了穩定的交付品質。Hazel 的另一個特質是學得快、問題不過夜——遇到不熟悉的流程，她不會卡住等答案，而是先自己找、找不到再問，問完之後下次自己會。這種解決問題的方式讓主管省心，也讓她在短時間內實質承擔起超出職級的業務範圍。',
+    quote: '交給 Hazel 的事，不用追、不用擔心——這在人手不足的季度，是最珍貴的特質。',
+    photo: 'images/Hazel廖珮涵.png'
+  },
+  {
+    id: 'jinlan',
+    name: '李金蘭',
+    dept: '營運部',
+    deptClass: 'dept-ops',
+    role: '營運主管 · 苗栗分公司',
+    avatarText: '金',
+    avatarBg: '#FAEEDA', avatarColor: '#633806',
+    values: ['承諾與責任', '團隊協作', '同理心', '卓越專業'],
+    story: '楊梅分公司深陷人力危機——半年三位資深同仁離職，營運主管確診癌症緊急住院。金蘭姐第一時間答應跨分公司支援，每日往返苗栗與楊梅超過 3 小時通勤，抵達現場第一天便穩定全員情緒，讓原本緊繃的辦公室重新出現笑容。她同時在第一線服務一位攜帶舊股票的年長客戶，親自聯繫股務單位、備妥回郵信封，讓客戶深受感動。楊梅分公司在她接手後，日常營運與結算交割零失誤。',
+    quote: '在最需要有人站出來的時刻，她不只是撐住現場，更讓整個團隊重新穩定、甚至變得更有溫度與力量，是真正的營運 MVP。',
+    photo: 'images/李金蘭.png'
+  },
+  {
+    id: 'eric',
+    name: '王祥宇',
+    dept: '私募',
+    deptClass: 'dept-private',
+    role: '產品專家',
+    avatarText: '祥',
+    avatarBg: '#EEEDFE', avatarColor: '#3C3489',
+    values: ['創業家精神', '服務意識', '跨部門協作'],
+    story: '2025 年 4 月加入美好私募，沒有金融業背景，在台灣人脈幾乎從零開始。加入 2 個月即順利上手錄音交易工作，試用期內自行開發超過 10 位客戶，完成私募業績試用期標準。每週駐點楊梅與中壢分公司，快速融入 FC 社群，帶動較無動能的同仁進入 PE 推動行列。已排定 2026 全年講座 schedule，連太太都成為業務夥伴。',
+    quote: '成熟、穩重，始終保持笑容，為私募及分公司帶進好的工作氛圍。在他的世界裡，邊界不是障礙，是下一個挑戰。',
+    photo: 'images/Eric_王祥宇.png'
+  },
+  {
+    id: 'iris',
+    name: '黃鈺鈞 Iris',
+    dept: '財務部',
+    deptClass: 'dept-finance',
+    role: '財務分析',
+    avatarText: 'IR',
+    avatarBg: '#E6F1FB', avatarColor: '#0C447C',
+    values: ['挑戰創新', '承諾 Commitment', '同理心'],
+    story: '公司請採購流程長期依賴多份獨立簽呈與人工追蹤，錯誤風險高。Iris 身為新進同仁，主動承接「請採購系統化」重任，歷經複雜邏輯建構、多次系統崩壞、防火牆限制等重重關卡，始終冷靜推進。最終系統成功上線，涵蓋採購金額 1.3 億元，每年減少 641 小時作業時間，系統上線一個月使用者滿意度達 87.78%。',
+    quote: '以高度使命感與創業家精神，成功整合複雜請採購流程，為公司創造顯著效率提升。',
+    photo: 'images/Iris_黃鈺鈞.jpg'
+  },
+  {
+    id: 'roger',
+    name: '陳泰宇 Roger',
+    dept: '投顧',
+    deptClass: 'dept-advisory',
+    role: '研究員',
+    avatarText: 'RO',
+    avatarBg: '#E6F1FB', avatarColor: '#0C447C',
+    values: ['挑戰創新', '行動力', '技術實力'],
+    story: '身為研究員，Roger 主動投入請採購系統的前端開發，每晚利用個人時間架設系統網站，歷經多次邏輯調整與架構重整，六個月密集投入後讓系統穩定上線。系統涵蓋採購金額 1.3 億元，每年減少 641 小時作業時間，上線後員工困擾程度降低 88.89%。在他的字典裡，沒有「做不到」，只有「如何做得更好」。',
+    quote: '鈺鈞與 Roger 以高度的使命感，成功整合複雜請採購流程並即時上線，值得高度推薦。',
+    photo: 'images/Roger_陳泰宇.png'
+  },
+  {
+    id: 'penny',
+    name: '羅珮珊 Penny',
+    dept: '科技產品部',
+    deptClass: 'dept-tech',
+    role: 'Team Good Wallet · 前端工程師',
+    avatarText: 'PE',
+    avatarBg: '#FAECE7', avatarColor: '#712B13',
+    values: ['同理心', '創業家精神', '團隊協作'],
+    story: '在招聘計劃未完成、前後端人力均出現瓶頸的情況下，Penny 主動學習後端與 iOS 開發——兩個她此前從未接觸的領域——在公餘時間自主進修，並如期如質完成跨角色工作。輪值維運期間，她積極回應 Slack 上的每一個客戶問題；即使非輪值期間，假日與下班後仍主動排除線上系統問題，展現對產品、團隊與公司的 ownership。',
+    quote: '勇於主動承擔挑戰與責任且創造優異的成果，過程中展現對公司、團隊、產品的認同與承諾。',
+    photo: 'images/Penny_羅珮珊.png'
+  }
+];
+
+const votes = new Set();
+const expanded = new Set();
+const MAX = 3;
+
+function render() {
+  const grid = document.getElementById('card-grid');
+  grid.innerHTML = '';
+  const maxed = votes.size >= MAX;
+
+  candidates.forEach(c => {
+    const voted = votes.has(c.id);
+    const isMaxed = maxed && !voted;
+    const isExp = expanded.has(c.id);
+
+    const card = document.createElement('div');
+    card.className = 'card' + (voted ? ' selected' : '') + (isMaxed ? ' maxed' : '');
+
+    card.innerHTML = `
+      <div class="card-photo">
+        <img src="${c.photo}" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="avatar-fallback" style="background:${c.avatarBg};color:${c.avatarColor};display:none">${c.avatarText}</div>
+        <div class="check-badge">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <polyline points="2,7 5.5,10.5 12,4" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="dept-tag ${c.deptClass}">${c.dept}</div>
+        <div class="card-name">${c.name}</div>
+        <div class="card-role">${c.role}</div>
+        <div class="value-tags">${c.values.map(v=>`<span class="vtag">${v}</span>`).join('')}</div>
+        <div class="story-wrap">
+          <div class="story ${isExp ? '' : 'clamped'}" id="story-${c.id}">${c.story}</div>
+          <button class="read-toggle" onclick="toggleExp(event,'${c.id}')">${isExp ? '收起' : '閱讀更多'}</button>
+        </div>
+        <div class="quote-block">${c.quote}</div>
+      </div>
+      <div class="card-footer">
+        <button class="vote-btn ${voted ? 'voted' : ''}" ${isMaxed ? 'disabled' : ''} onclick="toggleVote(event,'${c.id}')">
+          ${voted ? '已投票 ✓' : '投票'}
+        </button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  updateTracker();
+}
+
+function toggleVote(e, id) {
+  e.stopPropagation();
+  if (votes.has(id)) votes.delete(id);
+  else if (votes.size < MAX) votes.add(id);
+  render();
+}
+
+function toggleExp(e, id) {
+  e.stopPropagation();
+  expanded.has(id) ? expanded.delete(id) : expanded.add(id);
+  render();
+}
+
+function updateTracker() {
+  const n = votes.size;
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('d'+i).className = 'dot' + (i <= n ? ' filled' : '');
+  }
+  const labels = [
+    '尚未投票',
+    '已選 <strong>1</strong> 位，還可以選 2 位',
+    '已選 <strong>2</strong> 位，還可以選 1 位',
+    '已選 <strong>3</strong> 位 — 可以送出了！'
+  ];
+  document.getElementById('tracker-label').innerHTML = labels[n];
+
+  const voterName = document.getElementById('voter-name').value.trim();
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = n < MAX || !voterName;
+
+  const hints = [
+    '請選擇 3 位候選人後填寫姓名並提交。',
+    '再選 2 位候選人。',
+    '再選 1 位候選人。',
+    voterName ? '確認後按下送出。' : '請填寫投票人姓名後送出。'
+  ];
+  document.getElementById('submit-hint').textContent = hints[n];
+}
+
+document.getElementById('voter-name').addEventListener('input', updateTracker);
+
+function submitVote() {
+  const name = document.getElementById('voter-name').value.trim();
+  const dept = document.getElementById('voter-dept').value.trim();
+  if (!name || votes.size < MAX) return;
+
+  const selected = candidates.filter(c => votes.has(c.id)).map(c => c.name);
+  const detail = `${name}${dept ? '（' + dept + '）' : ''} 投票給：${selected.join('、')}`;
+
+  document.getElementById('success-detail').textContent = detail;
+  document.getElementById('success-box').style.display = 'block';
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('submit-btn').textContent = '已送出';
+  document.getElementById('voter-name').disabled = true;
+  document.getElementById('voter-dept').disabled = true;
+
+  document.querySelectorAll('.vote-btn').forEach(b => b.disabled = true);
+  document.getElementById('success-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+render();
+</script>
+</body>
+</html>
