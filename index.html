@@ -587,6 +587,18 @@ function submitVote() {
   const selected = candidates.filter(c => votes.has(c.id)).map(c => c.name);
   const detail = `${name}${dept ? '（' + dept + '）' : ''} 投票給：${selected.join('、')}`;
 
+  // 送出至 Formspree
+  fetch('https://formspree.io/f/xbdpyldv', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      投票人: name,
+      部門: dept || '（未填寫）',
+      投票給: selected.join('、'),
+      完整紀錄: detail
+    })
+  });
+
   document.getElementById('success-detail').textContent = detail;
   document.getElementById('success-box').style.display = 'block';
   document.getElementById('submit-btn').disabled = true;
