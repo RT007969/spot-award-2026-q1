@@ -588,7 +588,7 @@ function submitVote() {
   const detail = `${name}${dept ? '（' + dept + '）' : ''} 投票給：${selected.join('、')}`;
 
   // 送出至 Formspree
-  fetch('https://formspree.io/f/xbdpyldv', {
+  fetch('https://formspree.io/f/mpqorwdo', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify({
