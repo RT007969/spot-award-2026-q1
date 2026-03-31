@@ -158,7 +158,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center top;
+    object-position: center center;
   }
   .avatar-fallback {
     width: 72px; height: 72px;
@@ -406,7 +406,8 @@ const candidates = [
     values: ['追求卓越', '主動創新'],
     story: 'Q1 正值 C&B 團隊人力調整期，薪資結算、新人報到建檔等核心業務無法中斷。Patty 在人手不足的情況下，獨立承接完整的月結作業與報到流程，每月準時交付，零錯誤、零延遲。更值得一提的是，她沒有把「做完」當終點——面對重複性高的建檔作業，她主動盤點流程缺口，提出簡化步驟的建議，讓後續交接更順暢。對一個還在熟悉業務的 C&B 新手來說，這份主動性不是理所當然的。',
     quote: '人少的時候，有人選擇等、有人選擇撐——Patty 選擇想辦法讓事情做得更好。',
-    photo: 'Patty%20余佩芳.png'
+    photo: 'Patty%20余佩芳.png',
+    photoPos: 'center 65%'
   },
   {
     id: 'hazel',
@@ -507,7 +508,7 @@ function render() {
 
     card.innerHTML = `
       <div class="card-photo">
-        <img src="${c.photo}" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <img src="${c.photo}" alt="${c.name}" style="object-position:${c.photoPos||'center center'}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="avatar-fallback" style="background:${c.avatarBg};color:${c.avatarColor};display:none">${c.avatarText}</div>
         <div class="check-badge">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
